@@ -1,0 +1,34 @@
+<html>
+<script src='https://d3js.org/d3.v5.min.js'></script>
+<style> circle {fill: lightblue; stroke:black;} </style>
+<body onload='init()'>
+<svg width=300 height=300>
+</svg>
+
+<script>
+async function init() {
+    var width = 200, 
+        height = 200,
+        margin = 50;
+    var xScale = d3.scaleLog().base(Math.E).domain([10, 150]).range([0, width]);
+    var ySacle = d3.scaleLog().base(Math.E).domain([10, 150]).range([height, 0]);
+
+    var svg = d3.select("svg").append("g").attr("transform", "translate(" + margin + "," + margin + ")" );
+    var yAxis = d3.axisLeft().scale(yScale).tickValues([10, 20, 50, 100]);
+    var xAxis = d3.axisBottom().scale(xScale).tickValues([10, 20, 50, 100]);
+
+    d3.select("svg").append("g").attr("transform", "translate(" + margin + "," + margin + ")").call(yAxis);
+    d3.select("svg").append("g").attr("transform", "translate(" + margin + "," + (margin + height) + ")").call(xAxis);
+
+    data = await d3.csv("https://flunky.github.io/cars2017.csv");
+    svg.selectAll("circle")
+        .data(data).enter()
+        .append("circle")
+        .attr("cx", function(d) {return xScale(parseFloat(d["AverageCityMPG"])); })
+        .attr("cy", function(d) {return yScale(parseFloat(d["AverageHeighwayMPG"])); })
+        .attr("r", function(d) {return 2 + parseFloat(d["EngineCylenders"]); });
+}
+</script>
+</body>
+</html>
+}
