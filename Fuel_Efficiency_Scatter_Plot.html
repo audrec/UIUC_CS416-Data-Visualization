@@ -7,28 +7,42 @@
 
 <script>
 async function init() {
+    // Render data from the resource
+    data = await d3.csv('https://flunky.github.io/cars2017.csv');
+
+    // Set plotting pixel canvas 
     var width = 200, 
         height = 200,
         margin = 50;
-    var xScale = d3.scaleLog().base(Math.E).domain([10, 150]).range([0, width]);
-    var ySacle = d3.scaleLog().base(Math.E).domain([10, 150]).range([height, 0]);
 
-    var svg = d3.select("svg").append("g").attr("transform", "translate(" + margin + "," + margin + ")" );
-    var yAxis = d3.axisLeft().scale(yScale).tickValues([10, 20, 50, 100]);
-    var xAxis = d3.axisBottom().scale(xScale).tickValues([10, 20, 50, 100]);
+    // Set scale for axes
+    var xScale = d3.scaleLog().domain([10, 150]).range([0, width]);
+    var yScale = d3.scaleLog().domain([10, 150]).range([height, 0]);
 
-    d3.select("svg").append("g").attr("transform", "translate(" + margin + "," + margin + ")").call(yAxis);
-    d3.select("svg").append("g").attr("transform", "translate(" + margin + "," + (margin + height) + ")").call(xAxis);
+    // Set Scatter Plot
+    d3.select("svg")
+    .append("g")
+    .attr("transform", "translate(" + margin + "," + margin + ")" )
+    .selectAll("circle")
+    .data(data)
+    .enter()
+    .append("circle")
+    .attr("cx", function(d) {return xScale(parseFloat(d["AverageCityMPG"])); })
+    .attr("cy", function(d) {return yScale(parseFloat(d["AverageHeighwayMPG"])); })
+    .attr("r", function(d) {return 2 + parseFloat(d["EngineCylenders"]); });
 
-    data = await d3.csv("https://flunky.github.io/cars2017.csv");
-    svg.selectAll("circle")
-        .data(data).enter()
-        .append("circle")
-        .attr("cx", function(d) {return xScale(parseFloat(d["AverageCityMPG"])); })
-        .attr("cy", function(d) {return yScale(parseFloat(d["AverageHeighwayMPG"])); })
-        .attr("r", function(d) {return 2 + parseFloat(d["EngineCylenders"]); });
+    // Set y label
+    d3.select("svg")
+    .append("g")
+    .attr("transform", "translate(" + margin + "," + margin + ")" )
+    .call(d3.axisLeft(yScale).tickValues([10,20,50,100]).tickFormat(d3.format("~s")))
+
+    // Set x label
+    d3.select("svg")
+    .append("g")
+    .attr("transform", "translate(" + margin + "," + margin+height + ")" )
+    .call(d3.axisBottom(xScale).tickValues([10,20,50,100]).tickFormat(d3.format("~s")))
 }
 </script>
 </body>
 </html>
-}
